@@ -1,0 +1,26 @@
+# Heiko Menzler
+# heikogeorg.menzler@stud.uni-goettingen.de
+#
+# Date: 27.04.2022
+
+[build-system]
+requires = ["setuptools>="]
+build-backend = "setuptools.build_meta"
+
+[tool.jupytext]
+formats = "notebooks///ipynb,scripts///py:percent,doc///md"
+
+# [tool.jupytext.formats]
+# "notebooks/" = "ipynb"
+# "scripts/" = "py:percent"
+# "doc/" = "md"
+
+[tool.yapf]
+based_on_style = "pep8"
+coalesce_brackets = true
+dedent_closing_brackets = true
+join_multiple_lines = true
+split_all_top_level_comma_separated_values = true
+split_all_comma_separated_values = false
+split_complex_comprehension = true
+blank_lines_around_top_level_definition = 1
