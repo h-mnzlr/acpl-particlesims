@@ -14,13 +14,13 @@ def symmetric_func(x):
 def test_integrate_1D():
     interval = np.array([-1, 1])
     samples = 10000
-    res = integrate.integrate_uniform(symmetric_func, samples, interval)
+    res, _ = integrate.integrate_uniform(symmetric_func, samples, interval)
     assert pytest.approx(res, abs=0.1) == 0
 
 def test_integrate_2D():
     interval = np.array([[-1, 1], [-1, 1]])
     samples = 10000
-    res = integrate.integrate_uniform(symmetric_func, samples, interval)
+    res, _ = integrate.integrate_uniform(symmetric_func, samples, interval)
     assert pytest.approx(res, abs=0.1) == 0
 
 def test_integrate_ND():
@@ -28,5 +28,5 @@ def test_integrate_ND():
     for dim in dims:
         interval = np.array([-1, 1] * dim)
         samples = 10000
-        res = integrate.integrate_uniform(symmetric_func, samples, interval)
+        res, _ = integrate.integrate_uniform(symmetric_func, samples, interval)
         assert pytest.approx(res, abs=0.1) == 0
