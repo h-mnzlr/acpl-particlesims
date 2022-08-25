@@ -25,9 +25,9 @@ def integrate_uniform(
 
     lengths = interval[..., 1] - interval[..., 0]
     assert isinstance(lengths, np.ndarray)
-    length = lengths.max()
+    volume_element = np.multiply.reduce(lengths)
 
     function_samples = func(mc_numbers)
-    res = np.sum(function_samples / samples * length, axis=-1)
-    error = length.max() * np.std(function_samples) / samples
+    res = np.sum(function_samples / samples * volume_element, axis=-1)
+    error = volume_element * np.std(function_samples) / np.sqrt(samples)
     return np.squeeze(res), error
