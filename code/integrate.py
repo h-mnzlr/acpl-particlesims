@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray, ArrayLike
 
 IntegrableFunction = Callable[[NDArray[np.float64]], np.float64]
-IntegrationInterval = NDArray[np.int16] | ArrayLike
+IntegrationInterval = NDArray[np.float64] | ArrayLike
 
 def integrate_uniform(
     func: IntegrableFunction, samples: int, interval: IntegrationInterval
