@@ -17,7 +17,6 @@ def integrate_uniform(
 ) -> tuple[NDArray[np.float64], np.float64]:
     """Integrate the function using MC methods on a uniform distribution."""
     interval = np.array(interval, ndmin=2)
-    print(interval.shape)
     mc_numbers = np.random.uniform(
         interval[..., 0],
         interval[..., 1],
