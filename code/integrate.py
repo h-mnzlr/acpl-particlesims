@@ -11,21 +11,39 @@ from numpy.typing import NDArray, ArrayLike
 
 IntegrableFunction = Callable[[NDArray[np.float64]], np.float64]
 IntegrationInterval = NDArray[np.float64] | ArrayLike
+IntegrationParameters = NDArray[np.int16] | ArrayLike
 
-def integrate_uniform(
-    func: IntegrableFunction, samples: int, interval: IntegrationInterval
-) -> tuple[NDArray[np.float64], np.float64]:
-    """Integrate the function using MC methods on a uniform distribution."""
+Sampler = Callable[[int], NDArray[np.float64]]
+
+def uniform_sampler(samples: int, interval: IntegrationInterval):
+    """Generate an array of uniformly distributed samples."""
     interval = np.array(interval, ndmin=2)
     mc_numbers = np.random.uniform(
         interval[..., 0],
         interval[..., 1],
         size=(samples, *interval.shape[:-1])
     )
+    return mc_numbers
 
-    lengths = interval[..., 1] - interval[..., 0]
-    assert isinstance(lengths, np.ndarray)
-    volume_element = np.multiply.reduce(lengths)
+def flavor_sampler(samples: int):
+    """Generate an array of flavor samples."""
+    flavors = (1, 2, 3, 4, 5)
+    return np.random.choice(flavors, size=(samples, ))
+
+def quark_scattering_process(samples: int, interval: IntegrationInterval):
+    """Generate a random event of a scattering process producing quarks."""
+    flavor_samples = flavor_sampler(samples)
+    theta_phi_array = uniform_sampler(samples, interval)
+    return np.c_[theta_phi_array[:], flavor_samples.astype(np.float64)]
+
+def integrate_sampler(
+    func: IntegrableFunction,
+    samples: int,
+    sampler: Sampler,
+    volume_element: float
+) -> tuple[NDArray[np.float64], np.float64]:
+    """Integrate the function using MC methods on a uniform distribution."""
+    mc_numbers = sampler(samples)
 
     function_samples = func(mc_numbers)
     res = np.sum(function_samples / samples * volume_element, axis=-1)
