@@ -40,12 +40,17 @@ def integrate_sampler(
     func: IntegrableFunction,
     samples: int,
     sampler: Sampler,
-    volume_element: float
-) -> tuple[NDArray[np.float64], np.float64]:
+    volume_element: float,
+    realizations: int = 1
+) -> tuple[np.float64, np.float64]:
     """Integrate the function using MC methods on a uniform distribution."""
-    mc_numbers = sampler(samples)
 
-    function_samples = func(mc_numbers)
-    res = np.sum(function_samples / samples * volume_element, axis=-1)
-    error = volume_element * np.std(function_samples) / np.sqrt(samples)
-    return np.squeeze(res), error
+    res = []
+    for _ in range(realizations):
+        mc_numbers = sampler(samples)
+        function_samples = func(mc_numbers)
+        res.append(
+            np.sum(function_samples / samples * volume_element, axis=-1)
+        )
+
+    return np.mean(res), np.std(res)
