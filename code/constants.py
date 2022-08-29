@@ -3,7 +3,7 @@
 #
 # Date: 25.08.2022
 
-import scipy.constants
+import scipy.constants as const
 
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
@@ -38,4 +38,30 @@ def quark_info(flavors: NDArray[np.int16] | ArrayLike) -> NDArray[np.float64]:
     )
 
 def __getattr__(name: str):
-    return getattr(scipy.constants, name)
+    return getattr(const, name)
+
+def scattering_mat(flav, s, theta, _):
+    """Scattering matrix element for given flavor and particle outcome."""
+    quark_charge, quark_iso_spin = quark_info(flav)
+    prefactor = (4 * const.pi * QED_COUPLING)**2 * NUM_QCD_COLORS
+
+    kappa = 1 / 4 / WEINBERG_ANGLE_SQ_SINE / (1 - WEINBERG_ANGLE_SQ_SINE)
+    chi_denom = (s - Z_MASS**2)**2 + Z_MASS**2 * Z_DECAY_WIDTH**2
+    chi1 = kappa * s * (s - Z_MASS**2) / chi_denom
+    chi2 = kappa**2 * s**2 / chi_denom
+
+    a_elec = DOWN_QUARK_WEAK_ISOSPIN
+    a_quark = quark_iso_spin
+    v_elec = DOWN_QUARK_WEAK_ISOSPIN - 2 * ELECTRON_CHARGE * WEINBERG_ANGLE_SQ_SINE
+    v_quark = quark_iso_spin - 2 * quark_charge * WEINBERG_ANGLE_SQ_SINE
+    cos_pre = 4 * ELECTRON_CHARGE * quark_charge * a_elec * a_quark * chi1 \
+        + 8 * a_elec * v_elec * a_quark * v_quark * chi2
+
+    cos_sq_pre = ELECTRON_CHARGE ** 2 * quark_charge ** 2 \
+        + 2 * ELECTRON_CHARGE * quark_charge * v_elec * v_quark * chi1 \
+        + (a_elec ** 2 + v_elec ** 2) * (a_quark ** 2 + v_quark ** 2) * chi2
+
+    cos_theta = np.cos(theta)
+    val = cos_theta * cos_pre + (1 + cos_theta * cos_theta) * cos_sq_pre
+
+    return prefactor * val
