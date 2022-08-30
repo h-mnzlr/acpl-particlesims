@@ -40,7 +40,7 @@ def quark_info(flavors: NDArray[np.int16] | ArrayLike) -> NDArray[np.float64]:
 def __getattr__(name: str):
     return getattr(const, name)
 
-def scattering_mat(flav, s, theta, _):
+def scattering_mat(flav, s, costheta, _):
     """Scattering matrix element for given flavor and particle outcome."""
     quark_charge, quark_iso_spin = quark_info(flav)
     prefactor = (4 * const.pi * QED_COUPLING)**2 * NUM_QCD_COLORS
@@ -61,7 +61,6 @@ def scattering_mat(flav, s, theta, _):
         + 2 * ELECTRON_CHARGE * quark_charge * v_elec * v_quark * chi1 \
         + (a_elec ** 2 + v_elec ** 2) * (a_quark ** 2 + v_quark ** 2) * chi2
 
-    cos_theta = np.cos(theta)
-    val = cos_theta * cos_pre + (1 + cos_theta * cos_theta) * cos_sq_pre
+    val = costheta * cos_pre + (1 + costheta * costheta) * cos_sq_pre
 
     return prefactor * val
