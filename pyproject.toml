@@ -8,12 +8,7 @@ requires = ["setuptools>="]
 build-backend = "setuptools.build_meta"
 
 [tool.jupytext]
-formats = "notebooks///ipynb,scripts///py:percent,doc///md"
-
-# [tool.jupytext.formats]
-# "notebooks/" = "ipynb"
-# "scripts/" = "py:percent"
-# "doc/" = "md"
+formats = "notebooks///ipynb,scripts///py:percent"
 
 [tool.yapf]
 based_on_style = "pep8"
