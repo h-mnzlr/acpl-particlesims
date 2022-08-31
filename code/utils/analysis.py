@@ -11,7 +11,7 @@ class Analysis:
     """Analyzer of 2->(n jet) scattering events, histogramming differential jet
     rate cross sections
 
-      d\sigma / d\log_10(y_{n,n+1})
+      d\\sigma / d\\log_10(y_{n,n+1})
 
     for various n. The integrated n-jet rates are also calculated and stored as
     scatter data.
@@ -107,7 +107,7 @@ class Analysis:
         return 2.0 * min(p_i.E**2, p_j.E**2) * (1.0 - cos_theta) / q2
 
     def cluster(self, event: list[Particle]):
-        """Applies the k_T clustering algorithm to a an event (= list of
+        """Applies the k_T clustering algorithm to an event (= list of
         Particle instances). A y_cut is not used, i.e. the clustering continues
         until only two jets are left.
 
@@ -130,21 +130,22 @@ class Analysis:
         # Z mass.
 
         final_state_momenta = list(map(lambda part: part.mom, event[2:]))
-        distances = map(
-            lambda moms: self.y_ij(moms[0], moms[1], const.Z_MASS**2),
-            itertools.combinations(final_state_momenta, 2)
-        )
 
-        # while len(final_state_momenta) >= 2:
-        #     distances = []
-        #     for (idx1, mom1), (idx2, mom2) in itertools.combinations(
-        #         enumerate(final_state_momenta), 2
-        #     ):
-        #         y_ij = self.y_ij(mom1, mom2, const.Z_MASS**2)
-        #         distances.append((y_ij, idx1, idx2))
+        split_scales = []
+        while len(final_state_momenta) > 2:
+            distances = map(
+                lambda moment: (
+                    self.y_ij(moment[0][1], moment[1][1], const.Z_MASS**2),
+                    moment[0][0],
+                    moment[1][0]
+                ),
+                itertools.combinations(enumerate(final_state_momenta), 2)
+            )
 
-        #     _, idx1, idx2 = min(distances, key=lambda x, *_: x)
-        #     mom_combine = final_state_momenta.pop(max(idx1, idx2))
-        #     final_state_momenta[min(idx1, idx2)] += mom_combine
+            min_distance, idx1, idx2 = min(distances, key=lambda x, *_: x)
+            mom_combine = final_state_momenta.pop(max(idx1, idx2))
+            final_state_momenta[min(idx1, idx2)] += mom_combine
 
-        return list(sorted(distances))
+            split_scales.append(min_distance)
+
+        return split_scales
